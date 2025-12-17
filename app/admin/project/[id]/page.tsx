@@ -17,6 +17,8 @@ export default function ProjectPage() {
   const [newScreenName, setNewScreenName] = useState('')
   const [editingProjectName, setEditingProjectName] = useState(false)
   const [projectName, setProjectName] = useState('')
+  const [editingScreenId, setEditingScreenId] = useState<string | null>(null)
+  const [editingScreenName, setEditingScreenName] = useState('')
   const [uploading, setUploading] = useState<string | null>(null)
   const [showStats, setShowStats] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -49,6 +51,14 @@ export default function ProjectPage() {
     await supabase.from('projects').update({ name: projectName.trim() }).eq('id', project.id)
     setProject({ ...project, name: projectName.trim() })
     setEditingProjectName(false)
+  }
+
+  async function updateScreenName(screenId: string) {
+    if (!editingScreenName.trim()) return
+    await supabase.from('screens').update({ name: editingScreenName.trim() }).eq('id', screenId)
+    setScreens(screens.map(s => s.id === screenId ? { ...s, name: editingScreenName.trim() } : s))
+    setEditingScreenId(null)
+    setEditingScreenName('')
   }
 
   async function createScreen() {
@@ -284,7 +294,18 @@ export default function ProjectPage() {
                         <button onClick={() => moveScreen(screenIndex, 'up')} disabled={screenIndex === 0} className="text-zinc-500 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed text-xs">↑</button>
                         <button onClick={() => moveScreen(screenIndex, 'down')} disabled={screenIndex === screens.length - 1} className="text-zinc-500 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed text-xs">↓</button>
                       </div>
-                      <h3 className="font-medium">{screen.name}</h3>
+                      {editingScreenId === screen.id ? (
+                        <div className="flex items-center gap-2">
+                          <input type="text" value={editingScreenName} onChange={(e) => setEditingScreenName(e.target.value)} className="font-medium bg-zinc-800 border border-zinc-700 rounded-lg px-2 py-1 focus:outline-none focus:border-violet-500" autoFocus onKeyDown={(e) => { if (e.key === 'Enter') updateScreenName(screen.id); if (e.key === 'Escape') { setEditingScreenId(null); setEditingScreenName('') } }} />
+                          <button onClick={() => updateScreenName(screen.id)} className="text-violet-400 hover:text-violet-300 text-sm">OK</button>
+                          <button onClick={() => { setEditingScreenId(null); setEditingScreenName('') }} className="text-zinc-400 hover:text-white text-sm">Annuler</button>
+                        </div>
+                      ) : (
+                        <h3 className="font-medium flex items-center gap-2">
+                          {screen.name}
+                          <button onClick={() => { setEditingScreenId(screen.id); setEditingScreenName(screen.name) }} className="text-zinc-500 hover:text-white text-sm">✎</button>
+                        </h3>
+                      )}
                       {screenVotes.length > 0 && (
                         <span className="flex items-center gap-1 text-xs text-rose-400">♥ {screenVotes.length}</span>
                       )}
