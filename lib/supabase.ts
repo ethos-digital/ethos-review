@@ -33,6 +33,8 @@ export interface Screen {
   sort_order: number
   desktop_image?: string
   mobile_image?: string
+  desktop_label?: string
+  mobile_label?: string
   created_at: string
 }
 

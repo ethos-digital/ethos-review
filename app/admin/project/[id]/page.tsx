@@ -19,6 +19,9 @@ export default function ProjectPage() {
   const [projectName, setProjectName] = useState('')
   const [editingScreenId, setEditingScreenId] = useState<string | null>(null)
   const [editingScreenName, setEditingScreenName] = useState('')
+  const [editingLabelId, setEditingLabelId] = useState<string | null>(null)
+  const [editingLabelType, setEditingLabelType] = useState<'desktop' | 'mobile' | null>(null)
+  const [editingLabelText, setEditingLabelText] = useState('')
   const [uploading, setUploading] = useState<string | null>(null)
   const [showStats, setShowStats] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -59,6 +62,16 @@ export default function ProjectPage() {
     setScreens(screens.map(s => s.id === screenId ? { ...s, name: editingScreenName.trim() } : s))
     setEditingScreenId(null)
     setEditingScreenName('')
+  }
+
+  async function updateLabel(screenId: string) {
+    if (!editingLabelText.trim() || !editingLabelType) return
+    const field = editingLabelType === 'desktop' ? 'desktop_label' : 'mobile_label'
+    await supabase.from('screens').update({ [field]: editingLabelText.trim() }).eq('id', screenId)
+    setScreens(screens.map(s => s.id === screenId ? { ...s, [field]: editingLabelText.trim() } : s))
+    setEditingLabelId(null)
+    setEditingLabelType(null)
+    setEditingLabelText('')
   }
 
   async function createScreen() {
@@ -286,6 +299,8 @@ export default function ProjectPage() {
           <div className="space-y-4">
             {screens.map((screen, screenIndex) => {
               const screenVotes = getScreenVotes(screen.id)
+              const desktopLabel = screen.desktop_label || 'Desktop'
+              const mobileLabel = screen.mobile_label || 'Mobile'
               return (
                 <div key={screen.id} className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
                   <div className="px-5 py-4 border-b border-zinc-800 flex items-center justify-between">
@@ -315,10 +330,20 @@ export default function ProjectPage() {
                   <div className="p-5">
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <div className="text-xs text-zinc-500 uppercase">Desktop</div>
+                        {editingLabelId === screen.id && editingLabelType === 'desktop' ? (
+                          <div className="flex items-center gap-2">
+                            <input type="text" value={editingLabelText} onChange={(e) => setEditingLabelText(e.target.value)} className="text-xs uppercase bg-zinc-800 border border-zinc-700 rounded px-2 py-1 focus:outline-none focus:border-violet-500" autoFocus onKeyDown={(e) => { if (e.key === 'Enter') updateLabel(screen.id); if (e.key === 'Escape') { setEditingLabelId(null); setEditingLabelType(null); setEditingLabelText('') } }} />
+                            <button onClick={() => updateLabel(screen.id)} className="text-violet-400 hover:text-violet-300 text-xs">OK</button>
+                          </div>
+                        ) : (
+                          <div className="text-xs text-zinc-500 uppercase flex items-center gap-1">
+                            {desktopLabel}
+                            <button onClick={() => { setEditingLabelId(screen.id); setEditingLabelType('desktop'); setEditingLabelText(desktopLabel) }} className="text-zinc-600 hover:text-white">✎</button>
+                          </div>
+                        )}
                         {screen.desktop_image ? (
                           <div className="relative group">
-                            <img src={screen.desktop_image} alt="Desktop" className="w-full h-40 object-cover rounded-lg border border-zinc-700" />
+                            <img src={screen.desktop_image} alt={desktopLabel} className="w-full h-40 object-cover rounded-lg border border-zinc-700" />
                             <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-2 rounded-lg transition-opacity">
                               <button onClick={() => triggerUpload(screen.id, 'desktop')} className="px-3 py-1.5 bg-zinc-700 hover:bg-zinc-600 rounded-lg text-sm">Remplacer</button>
                               <button onClick={() => deleteImage(screen.id, 'desktop')} className="px-3 py-1.5 bg-red-500/20 hover:bg-red-500/40 text-red-400 rounded-lg text-sm">Supprimer</button>
@@ -331,10 +356,20 @@ export default function ProjectPage() {
                         )}
                       </div>
                       <div className="space-y-2">
-                        <div className="text-xs text-zinc-500 uppercase">Mobile</div>
+                        {editingLabelId === screen.id && editingLabelType === 'mobile' ? (
+                          <div className="flex items-center gap-2">
+                            <input type="text" value={editingLabelText} onChange={(e) => setEditingLabelText(e.target.value)} className="text-xs uppercase bg-zinc-800 border border-zinc-700 rounded px-2 py-1 focus:outline-none focus:border-violet-500" autoFocus onKeyDown={(e) => { if (e.key === 'Enter') updateLabel(screen.id); if (e.key === 'Escape') { setEditingLabelId(null); setEditingLabelType(null); setEditingLabelText('') } }} />
+                            <button onClick={() => updateLabel(screen.id)} className="text-violet-400 hover:text-violet-300 text-xs">OK</button>
+                          </div>
+                        ) : (
+                          <div className="text-xs text-zinc-500 uppercase flex items-center gap-1">
+                            {mobileLabel}
+                            <button onClick={() => { setEditingLabelId(screen.id); setEditingLabelType('mobile'); setEditingLabelText(mobileLabel) }} className="text-zinc-600 hover:text-white">✎</button>
+                          </div>
+                        )}
                         {screen.mobile_image ? (
                           <div className="relative group">
-                            <img src={screen.mobile_image} alt="Mobile" className="w-full h-40 object-cover rounded-lg border border-zinc-700" />
+                            <img src={screen.mobile_image} alt={mobileLabel} className="w-full h-40 object-cover rounded-lg border border-zinc-700" />
                             <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-2 rounded-lg transition-opacity">
                               <button onClick={() => triggerUpload(screen.id, 'mobile')} className="px-3 py-1.5 bg-zinc-700 hover:bg-zinc-600 rounded-lg text-sm">Remplacer</button>
                               <button onClick={() => deleteImage(screen.id, 'mobile')} className="px-3 py-1.5 bg-red-500/20 hover:bg-red-500/40 text-red-400 rounded-lg text-sm">Supprimer</button>

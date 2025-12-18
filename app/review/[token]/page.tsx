@@ -242,6 +242,8 @@ export default function ReviewPage() {
   const showDesktop = hasDesktopImage()
   const showMobile = hasMobileImage()
   const totalVotes = screens.reduce((sum, s) => sum + getScreenVotes(s.id), 0)
+  const desktopLabel = currentScreen?.desktop_label || 'Desktop'
+  const mobileLabel = currentScreen?.mobile_label || 'Mobile'
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
@@ -347,8 +349,8 @@ export default function ReviewPage() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="flex items-center gap-1 bg-zinc-800 rounded-lg p-1">
-                  {showDesktop && <button onClick={() => setDevice('desktop')} className={`px-3 py-1.5 rounded-md text-sm transition-all ${device === 'desktop' ? 'bg-zinc-700 text-white' : 'text-zinc-400 hover:text-white'}`}>Desktop</button>}
-                  {showMobile && <button onClick={() => setDevice('mobile')} className={`px-3 py-1.5 rounded-md text-sm transition-all ${device === 'mobile' ? 'bg-zinc-700 text-white' : 'text-zinc-400 hover:text-white'}`}>Mobile</button>}
+                  {showDesktop && <button onClick={() => setDevice('desktop')} className={`px-3 py-1.5 rounded-md text-sm transition-all ${device === 'desktop' ? 'bg-zinc-700 text-white' : 'text-zinc-400 hover:text-white'}`}>{desktopLabel}</button>}
+                  {showMobile && <button onClick={() => setDevice('mobile')} className={`px-3 py-1.5 rounded-md text-sm transition-all ${device === 'mobile' ? 'bg-zinc-700 text-white' : 'text-zinc-400 hover:text-white'}`}>{mobileLabel}</button>}
                 </div>
                 {currentScreen && (
                   <button onClick={() => handleVoteClick(currentScreen.id)} className={`px-3 py-1.5 rounded-lg text-sm flex items-center gap-1 transition-colors ${hasVoted(currentScreen.id) ? 'bg-rose-500/20 text-rose-400' : 'bg-zinc-800 text-zinc-400 hover:text-rose-400'}`}>
@@ -371,7 +373,7 @@ export default function ReviewPage() {
               {!currentScreen ? (
                 <div className="text-center py-12"><div className="text-6xl mb-4">🎨</div><h2 className="text-xl font-medium mb-2">Pas encore de maquettes</h2><p className="text-zinc-400">Les maquettes seront bientôt disponibles.</p></div>
               ) : !currentImage ? (
-                <div className="text-center py-12"><div className="text-6xl mb-4">📱</div><h2 className="text-xl font-medium mb-2">Pas de vue {device}</h2><p className="text-zinc-400">Cet écran n a pas de maquette {device}.</p></div>
+                <div className="text-center py-12"><div className="text-6xl mb-4">📱</div><h2 className="text-xl font-medium mb-2">Pas de vue {device === 'desktop' ? desktopLabel : mobileLabel}</h2><p className="text-zinc-400">Cet écran n a pas de maquette {device === 'desktop' ? desktopLabel : mobileLabel}.</p></div>
               ) : (
                 <div className="relative">
                   <div ref={imageRef} className="relative cursor-crosshair" onClick={handleImageClick}>
