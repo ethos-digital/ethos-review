@@ -5,7 +5,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Ethos Review",
+  title: "Ethos Conception",
   description: "Design review platform by Ethos Digital",
 };
 
