@@ -348,9 +348,9 @@ export default function ReviewPage() {
           <div className="border-b border-zinc-800 bg-zinc-900/30 px-4 py-2 flex-shrink-0">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="flex items-center gap-1 bg-zinc-800 rounded-lg p-1">
-                  {showDesktop && <button onClick={() => setDevice('desktop')} className={`px-3 py-1.5 rounded-md text-sm transition-all ${device === 'desktop' ? 'bg-zinc-700 text-white' : 'text-zinc-400 hover:text-white'}`}>{desktopLabel}</button>}
-                  {showMobile && <button onClick={() => setDevice('mobile')} className={`px-3 py-1.5 rounded-md text-sm transition-all ${device === 'mobile' ? 'bg-zinc-700 text-white' : 'text-zinc-400 hover:text-white'}`}>{mobileLabel}</button>}
+                <div className="flex items-center gap-1 bg-zinc-800/50 border border-zinc-700 rounded-lg p-1">
+                  {showDesktop && <button onClick={() => setDevice('desktop')} className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${device === 'desktop' ? 'bg-violet-500 text-white' : 'text-zinc-300 hover:text-white'}`}>{desktopLabel}</button>}
+                  {showMobile && <button onClick={() => setDevice('mobile')} className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${device === 'mobile' ? 'bg-violet-500 text-white' : 'text-zinc-300 hover:text-white'}`}>{mobileLabel}</button>}
                 </div>
                 {currentScreen && (
                   <button onClick={() => handleVoteClick(currentScreen.id)} className={`px-3 py-1.5 rounded-lg text-sm flex items-center gap-1 transition-colors ${hasVoted(currentScreen.id) ? 'bg-rose-500/20 text-rose-400' : 'bg-zinc-800 text-zinc-400 hover:text-rose-400'}`}>
